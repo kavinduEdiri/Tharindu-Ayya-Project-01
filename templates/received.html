@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Rentals — Sahan Rent a Tool{% endblock %}
+
+{% block extra_head %}
+<style>
+  .filter-tabs {
+    display: flex; gap: 8px; padding: 12px 16px 0; overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .filter-tabs::-webkit-scrollbar { display: none; }
+  .ftab {
+    padding: 7px 16px; border-radius: 20px; font-size: 12px; font-weight: 700;
+    white-space: nowrap; cursor: pointer; border: 2px solid var(--border);
+    background: var(--white); color: var(--text-muted); transition: all 0.2s;
+  }
+  .ftab.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+  .rental-card {
+    display: block; background: var(--white); border-radius: var(--radius);
+    box-shadow: var(--card-shadow); padding: 16px;
+    margin: 10px 16px 0; text-decoration: none; color: inherit;
+    transition: all 0.2s; position: relative; overflow: hidden;
+  }
+  .rental-card:active { transform: scale(0.98); }
+  .rental-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    background: var(--primary);
+  }
+  .rental-card.returned::before { background: var(--success); }
+  .rc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+  .rc-customer { font-size: 15px; font-weight: 800; color: var(--text); }
+  .rc-nic { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .rc-meta {
+    display: flex; gap: 14px; padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .rc-meta-item {
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .rc-meta-label { font-size: 10px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+  .rc-meta-value { font-size: 13px; font-weight: 700; color: var(--text); }
+  .rc-meta-value.price { color: var(--accent); }
+  .rc-arrow { color: var(--text-muted); font-size: 14px; }
+
+  .summary-strip {
+    background: var(--white); border-radius: var(--radius);
+    box-shadow: var(--card-shadow); padding: 12px 16px;
+    margin: 12px 16px 0; display: flex; gap: 0;
+  }
+  .ss-item { flex: 1; text-align: center; }
+  .ss-item + .ss-item { border-left: 1px solid var(--border); }
+  .ss-value { font-size: 20px; font-weight: 800; color: var(--text); }
+  .ss-label { font-size: 10px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+
+  @media (min-width: 640px) {
+    .filter-tabs { padding: 12px 24px 0; }
+    .rental-card { margin: 10px 24px 0; }
+    .summary-strip { margin: 12px 24px 0; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-title">Rental Records</div>
+  <div class="page-sub">Tap a record to view details</div>
+</div>
+
+{% set total_count = rentals|length %}
+{% set active_count = rentals|selectattr('status', 'eq', 'Rented')|list|length %}
+{% set returned_count = rentals|selectattr('status', 'eq', 'Returned')|list|length %}
+
+<div class="summary-strip">
+  <div class="ss-item">
+    <div class="ss-value">{{ total_count }}</div>
+    <div class="ss-label">Total</div>
+  </div>
+  <div class="ss-item">
+    <div class="ss-value" style="color:var(--accent);">{{ active_count }}</div>
+    <div class="ss-label">Active</div>
+  </div>
+  <div class="ss-item">
+    <div class="ss-value" style="color:var(--success);">{{ returned_count }}</div>
+    <div class="ss-label">Returned</div>
+  </div>
+</div>
+
+<div class="filter-tabs">
+  <div class="ftab active" onclick="filterRentals('all', this)">All</div>
+  <div class="ftab" onclick="filterRentals('Rented', this)">Active</div>
+  <div class="ftab" onclick="filterRentals('Returned', this)">Returned</div>
+</div>
+
+{% if rentals %}
+  {% for r in rentals %}
+  <a href="{{ url_for('rental_detail', rental_id=r.id) }}"
+     class="rental-card {% if r.status == 'Returned' %}returned{% endif %}"
+     data-status="{{ r.status }}">
+    <div class="rc-top">
+      <div>
+        <div class="rc-customer">{{ r.customer_name }}</div>
+        <div class="rc-nic">NIC: {{ r.nic }}</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="badge {% if r.status == 'Returned' %}badge-success{% else %}badge-warning{% endif %}">
+          <i class="fas fa-{% if r.status == 'Returned' %}check-circle{% else %}clock{% endif %}"></i>
+          {{ r.status }}
+        </span>
+        <i class="fas fa-chevron-right rc-arrow"></i>
+      </div>
+    </div>
+    <div class="rc-meta">
+      <div class="rc-meta-item">
+        <span class="rc-meta-label">Item</span>
+        <span class="rc-meta-value">{{ r.item_name }}</span>
+      </div>
+      <div class="rc-meta-item">
+        <span class="rc-meta-label">Date</span>
+        <span class="rc-meta-value">{{ r.rent_date }}</span>
+      </div>
+      <div class="rc-meta-item">
+        <span class="rc-meta-label">Days</span>
+        <span class="rc-meta-value">{{ r.num_days }}d</span>
+      </div>
+      <div class="rc-meta-item">
+        <span class="rc-meta-label">Total</span>
+        <span class="rc-meta-value price">Rs.{{ "{:,.0f}".format(r.total_amount) }}</span>
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+{% else %}
+  <div class="empty-state">
+    <i class="fas fa-clipboard-list"></i>
+    <p>No rentals yet. Create your first rental!</p>
+  </div>
+{% endif %}
+
+<div style="height: 8px;"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function filterRentals(status, el) {
+  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.rental-card').forEach(card => {
+    card.style.display = (status === 'all' || card.dataset.status === status) ? 'block' : 'none';
+  });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Item — Sahan Rent a Tool{% endblock %}
+
+{% block extra_head %}
+<style>
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 700; color: var(--primary);
+    text-decoration: none; padding: 8px 0; margin: 12px 16px 0; display: flex;
+  }
+  .form-card {
+    background: var(--white); border-radius: var(--radius);
+    box-shadow: var(--card-shadow); padding: 20px;
+    margin: 12px 16px 0;
+  }
+  .form-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  }
+  .form-header-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--primary-light); color: var(--primary);
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .form-header h3 { font-size: 16px; font-weight: 800; }
+  .form-header p { font-size: 12px; color: var(--text-muted); }
+  @media (min-width: 640px) {
+    .back-btn { margin: 12px 24px 0; }
+    .form-card { margin: 12px 24px 0; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('items') }}" class="back-btn">
+  <i class="fas fa-arrow-left"></i> Back to Items
+</a>
+
+<div class="form-card">
+  <div class="form-header">
+    <div class="form-header-icon"><i class="fas fa-screwdriver-wrench"></i></div>
+    <div>
+      <h3>{{ action }} Item</h3>
+      <p>{% if action == 'Add' %}Add a new rental item{% else %}Update item details{% endif %}</p>
+    </div>
+  </div>
+
+  <form method="POST">
+    <div class="form-group">
+      <label class="form-label">Item Name *</label>
+      <input type="text" name="name" class="form-control"
+        placeholder="e.g. Concrete Mixer"
+        value="{{ item.name if item else '' }}" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Price Per Day (Rs.) *</label>
+      <input type="number" name="price_per_day" class="form-control"
+        placeholder="e.g. 2500" min="0" step="0.01"
+        value="{{ item.price_per_day if item else '' }}" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Available Quantity *</label>
+      <input type="number" name="quantity" class="form-control"
+        placeholder="e.g. 5" min="1"
+        value="{{ item.quantity if item else '' }}" required>
+    </div>
+    <div style="display:flex; gap:10px; margin-top: 8px;">
+      <a href="{{ url_for('items') }}" class="btn btn-outline" style="flex:1;">Cancel</a>
+      <button type="submit" class="btn btn-primary" style="flex:2;">
+        <i class="fas fa-{% if action == 'Add' %}plus{% else %}check{% endif %}"></i>
+        {{ action }} Item
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

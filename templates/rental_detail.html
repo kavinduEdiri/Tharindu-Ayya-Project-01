@@ -1,0 +1,446 @@
+{% extends "base.html" %}
+{% block title %}Rental Detail — Sahan Rent a Tool{% endblock %}
+
+{% block extra_head %}
+<style>
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none;
+    padding: 12px 16px 0;
+    display: flex;
+  }
+
+  .detail-hero {
+    margin: 12px 16px 0;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: var(--radius);
+    padding: 20px;
+    color: white;
+  }
+
+  .detail-hero .customer {
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .detail-hero .nic {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 4px;
+  }
+
+  .detail-hero .address {
+    font-size: 13px;
+    opacity: 0.85;
+    margin-top: 8px;
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+  }
+
+  .detail-hero .status-row {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .status-pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .status-pill.rented {
+    background: rgba(249,115,22,0.2);
+    color: #FED7AA;
+    border: 1px solid rgba(249,115,22,0.3);
+  }
+
+  .status-pill.returned {
+    background: rgba(22,163,74,0.2);
+    color: #A7F3D0;
+    border: 1px solid rgba(22,163,74,0.3);
+  }
+
+  .rental-id {
+    font-size: 11px;
+    opacity: 0.6;
+  }
+
+  .detail-section {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    padding: 18px;
+    margin: 12px 16px 0;
+  }
+
+  .ds-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .ds-title i {
+    color: var(--primary);
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .info-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .info-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .info-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    text-align: right;
+    line-height: 1.5;
+  }
+
+  .info-value.total {
+    color: var(--primary);
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .item-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    background: #fafafa;
+  }
+
+  .item-card:last-child {
+    margin-bottom: 0;
+  }
+
+  .item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .item-name {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  .item-total {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--primary);
+    white-space: nowrap;
+  }
+
+  .item-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+
+  .item-meta-box {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+  }
+
+  .item-meta-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .item-meta-value {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  .return-section {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    padding: 18px;
+    margin: 12px 16px 0;
+  }
+
+  .action-btns {
+    padding: 12px 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .action-btns .btn {
+    padding: 14px;
+    font-size: 14px;
+  }
+
+  #actualCalc {
+    background: var(--primary-light);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    display: none;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 520px) {
+    .item-meta {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .back-btn {
+      padding: 12px 24px 0;
+    }
+
+    .detail-hero,
+    .detail-section,
+    .return-section {
+      margin: 12px 24px 0;
+    }
+
+    .action-btns {
+      padding: 12px 24px 0;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('received_items') }}" class="back-btn">
+  <i class="fas fa-arrow-left"></i> Back to Rentals
+</a>
+
+<div class="detail-hero">
+  <div class="customer">{{ rental.customer_name }}</div>
+  <div class="nic"><i class="fas fa-id-card"></i> {{ rental.nic }}</div>
+  <div class="address"><i class="fas fa-location-dot"></i> {{ rental.address }}</div>
+  <div class="status-row">
+    <span class="status-pill {% if rental.status == 'Rented' %}rented{% else %}returned{% endif %}">
+      <i class="fas fa-{% if rental.status == 'Rented' %}clock{% else %}check-circle{% endif %}"></i>
+      {{ rental.status }}
+    </span>
+    <span class="rental-id">ID: {{ rental.id }}</span>
+  </div>
+</div>
+
+<div class="detail-section">
+  <div class="ds-title"><i class="fas fa-calendar-days"></i> Rental Information</div>
+
+  <div class="info-row">
+    <span class="info-label">Rent Date</span>
+    <span class="info-value">{{ rental.rent_date }}</span>
+  </div>
+
+  <div class="info-row">
+    <span class="info-label">Duration</span>
+    <span class="info-value">{{ rental.num_days }} day(s)</span>
+  </div>
+
+  {% if rental.return_date %}
+  <div class="info-row">
+    <span class="info-label">Return Date</span>
+    <span class="info-value">{{ rental.return_date }}</span>
+  </div>
+  {% endif %}
+
+  <div class="info-row">
+    <span class="info-label">Total Different Items</span>
+    <span class="info-value">{{ rental["items"]|length }}</span>
+  </div>
+
+  <div class="info-row">
+    <span class="info-label">Total Quantity</span>
+    <span class="info-value">{{ rental["items"] | sum(attribute='quantity') }}</span>
+  </div>
+</div>
+
+<div class="detail-section">
+  <div class="ds-title"><i class="fas fa-tools"></i> Rented Items</div>
+
+  {% for item in rental["items"] %}
+  <div class="item-card">
+    <div class="item-top">
+      <div class="item-name">{{ item.item_name }}</div>
+      <div class="item-total">
+        Rs. {{ "{:,.0f}".format(item.price_per_day * item.quantity * rental.num_days) }}
+      </div>
+    </div>
+
+    <div class="item-meta">
+      <div class="item-meta-box">
+        <div class="item-meta-label">Unit Price</div>
+        <div class="item-meta-value">Rs. {{ "{:,.0f}".format(item.price_per_day) }}</div>
+      </div>
+
+      <div class="item-meta-box">
+        <div class="item-meta-label">Quantity</div>
+        <div class="item-meta-value">{{ item.quantity }}</div>
+      </div>
+
+      <div class="item-meta-box">
+        <div class="item-meta-label">Days</div>
+        <div class="item-meta-value">{{ rental.num_days }}</div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="detail-section">
+  <div class="ds-title"><i class="fas fa-calculator"></i> Payment Summary</div>
+
+  {% for item in rental["items"] %}
+  <div class="info-row">
+    <span class="info-label">
+      {{ item.item_name }} — Rs.{{ "{:,.0f}".format(item.price_per_day) }} × {{ item.quantity }} × {{ rental.num_days }} day(s)
+    </span>
+    <span class="info-value">
+      Rs. {{ "{:,.0f}".format(item.price_per_day * item.quantity * rental.num_days) }}
+    </span>
+  </div>
+  {% endfor %}
+
+  <div class="info-row">
+    <span class="info-label" style="font-size:15px; font-weight:800; color:var(--text);">Total Amount</span>
+    <span class="info-value total">Rs. {{ "{:,.0f}".format(rental.total_amount) }}</span>
+  </div>
+</div>
+
+{% if rental.status == 'Rented' %}
+<div class="return-section">
+  <div class="ds-title"><i class="fas fa-calendar-check"></i> Mark as Returned</div>
+
+  <form method="POST" action="{{ url_for('mark_returned', rental_id=rental.id) }}">
+    <div class="form-group">
+      <label class="form-label">Return Date</label>
+      <input
+        type="date"
+        name="return_date"
+        class="form-control"
+        value="{{ today }}"
+        required
+        id="retDate"
+        onchange="calcActual()"
+      >
+    </div>
+
+    <div id="actualCalc">
+      <i class="fas fa-info-circle"></i>
+      <span id="calcText"></span>
+    </div>
+
+    <button
+      type="submit"
+      class="btn btn-success btn-block"
+      onclick="return confirm('Mark this rental as returned?')"
+    >
+      <i class="fas fa-check-circle"></i> Mark as Returned
+    </button>
+  </form>
+</div>
+{% endif %}
+
+<div class="action-btns">
+  <a href="{{ url_for('generate_invoice', rental_id=rental.id) }}" target="_blank" class="btn btn-primary btn-block">
+    <i class="fas fa-file-invoice"></i> Generate Invoice (Print/PDF)
+  </a>
+</div>
+
+<div style="height: 8px;"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function calcActual() {
+  const rentDate = new Date('{{ rental.rent_date }}');
+  const retDateEl = document.getElementById('retDate');
+  if (!retDateEl) return;
+
+  const retDate = new Date(retDateEl.value);
+  if (isNaN(retDate)) return;
+
+  const days = Math.max(Math.round((retDate - rentDate) / 86400000), 1);
+
+  let total = 0;
+  let lines = [];
+
+  {% for item in rental["items"] %}
+  const itemPrice{{ loop.index }} = {{ item.price_per_day }};
+  const itemQty{{ loop.index }} = {{ item.quantity }};
+  const itemName{{ loop.index }} = {{ item.item_name|tojson }};
+  const itemTotal{{ loop.index }} = itemPrice{{ loop.index }} * itemQty{{ loop.index }} * days;
+
+  total += itemTotal{{ loop.index }};
+  lines.push(
+    itemName{{ loop.index }} + ': Rs.' +
+    itemPrice{{ loop.index }}.toLocaleString('en-LK') +
+    ' × ' + itemQty{{ loop.index }} +
+    ' × ' + days +
+    ' day(s) = Rs.' +
+    itemTotal{{ loop.index }}.toLocaleString('en-LK')
+  );
+  {% endfor %}
+
+  const el = document.getElementById('actualCalc');
+  document.getElementById('calcText').innerHTML =
+    '<strong>Actual calculation for ' + days + ' day(s):</strong><br>' +
+    lines.join('<br>') +
+    '<br><strong>Total = Rs.' + total.toLocaleString('en-LK') + '</strong>';
+
+  el.style.display = 'block';
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  if (document.getElementById('retDate')) {
+    calcActual();
+  }
+});
+</script>
+{% endblock %}

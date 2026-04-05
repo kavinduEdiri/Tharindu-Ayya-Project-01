@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Login — Sahan Rent a Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --primary: #1A6BCC; --primary-dark: #1457A8; --primary-light: #E8F1FB;
+    --accent: #F97316; --text: #1E293B; --text-muted: #64748B;
+    --border: #E2E8F0; --bg: #F1F5F9; --white: #FFFFFF;
+    --danger: #DC2626; --danger-light: #FEE2E2;
+  }
+  html, body {
+    min-height: 100%; font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg); -webkit-font-smoothing: antialiased;
+  }
+  .login-wrap {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  .login-hero {
+    background: linear-gradient(145deg, #1457A8 0%, #1A6BCC 50%, #2280E8 100%);
+    padding: 48px 24px 60px;
+    position: relative; overflow: hidden;
+    clip-path: ellipse(120% 100% at 50% 0%);
+  }
+  .login-hero::before {
+    content: '';
+    position: absolute; top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    background: rgba(255,255,255,0.06); border-radius: 50%;
+  }
+  .login-hero::after {
+    content: '';
+    position: absolute; bottom: -20px; left: -20px;
+    width: 120px; height: 120px;
+    background: rgba(249,115,22,0.15); border-radius: 50%;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 32px;
+  }
+  .brand-logo {
+    width: 48px; height: 48px;
+    background: rgba(255,255,255,0.15); border-radius: 14px; backdrop-filter: blur(10px);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 22px; border: 1px solid rgba(255,255,255,0.2);
+  }
+  .brand-name { color: white; }
+  .brand-name h1 { font-size: 18px; font-weight: 800; line-height: 1.1; }
+  .brand-name p { font-size: 11px; opacity: 0.7; margin-top: 2px; }
+  .hero-headline { color: white; }
+  .hero-headline h2 { font-size: 26px; font-weight: 800; line-height: 1.2; }
+  .hero-headline p { font-size: 14px; opacity: 0.75; margin-top: 8px; }
+  .hero-badges {
+    display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap;
+  }
+  .hero-badge {
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px; padding: 5px 12px; color: white;
+    font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  .login-form-wrap {
+    flex: 1; padding: 0 20px 32px;
+    margin-top: -20px; position: relative; z-index: 10;
+  }
+  .login-card {
+    background: white; border-radius: 20px; padding: 28px 24px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+  }
+  .login-card h3 { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .login-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+
+  .form-group { margin-bottom: 16px; }
+  .form-label {
+    display: block; font-size: 11px; font-weight: 700;
+    color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .input-wrap { position: relative; }
+  .input-icon {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); font-size: 14px; pointer-events: none;
+  }
+  .form-control {
+    width: 100%; padding: 13px 14px 13px 40px;
+    border: 2px solid var(--border); border-radius: 12px;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: var(--text);
+    background: var(--bg); outline: none; transition: all 0.2s;
+    -webkit-appearance: none;
+  }
+  .form-control:focus { border-color: var(--primary); background: white; }
+  .form-control::placeholder { color: #B0BAC9; }
+
+  .alert-error {
+    padding: 12px 14px; border-radius: 10px; margin-bottom: 16px;
+    background: var(--danger-light); color: var(--danger);
+    font-size: 13px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+    border-left: 4px solid var(--danger);
+  }
+
+  .btn-login {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white; border: none; border-radius: 12px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px; font-weight: 700; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s; margin-top: 8px;
+    box-shadow: 0 4px 16px rgba(26,107,204,0.35);
+  }
+  .btn-login:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26,107,204,0.45); }
+  .btn-login:active { transform: none; }
+
+  .demo-hint {
+    margin-top: 20px; padding: 14px;
+    background: var(--primary-light); border-radius: 12px;
+    font-size: 12px; color: var(--primary); font-weight: 600;
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .demo-hint i { margin-top: 1px; }
+</style>
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-hero">
+    <div class="brand">
+      <div class="brand-logo"><i class="fas fa-tools"></i></div>
+      <div class="brand-name">
+        <h1>Sahan Rent a Tool</h1>
+        <p>Construction Equipment Rentals</p>
+      </div>
+    </div>
+    <div class="hero-headline">
+      <h2>Manage Your Rentals Smarter</h2>
+      <p>Track tools, customers, and invoices all in one place.</p>
+    </div>
+    <div class="hero-badges">
+      <div class="hero-badge"><i class="fas fa-check-circle"></i> Real-time Tracking</div>
+      <div class="hero-badge"><i class="fas fa-file-invoice"></i> Invoice Generation</div>
+      <div class="hero-badge"><i class="fas fa-mobile-alt"></i> Mobile Friendly</div>
+    </div>
+  </div>
+
+  <div class="login-form-wrap">
+    <div class="login-card">
+      <h3>Welcome Back 👋</h3>
+      <p>Sign in to your account to continue</p>
+
+      {% if error %}
+      <div class="alert-error"><i class="fas fa-exclamation-circle"></i> {{ error }}</div>
+      {% endif %}
+
+      <form method="POST">
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <div class="input-wrap">
+            <i class="fas fa-envelope input-icon"></i>
+            <input type="email" name="email" class="form-control" placeholder="your@email.com" required autocomplete="email">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-wrap">
+            <i class="fas fa-lock input-icon"></i>
+            <input type="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+        </div>
+        <button type="submit" class="btn-login">
+          <i class="fas fa-right-to-bracket"></i> Sign In
+        </button>
+      </form>
+
+      <div class="demo-hint">
+        <i class="fas fa-circle-info"></i>
+        <div>
+          <strong>Demo credentials:</strong><br>
+          Email: admin@sahanrent.lk<br>
+          Password: admin123
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

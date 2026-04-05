@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Sahan Rent a Tool{% endblock %}
+
+{% block extra_head %}
+<style>
+  .welcome-strip {
+    background: linear-gradient(135deg, #1457A8, #1A6BCC);
+    margin: 0; padding: 20px 16px;
+    color: white;
+  }
+  .welcome-strip h2 { font-size: 20px; font-weight: 800; }
+  .welcome-strip p { font-size: 13px; opacity: 0.8; margin-top: 3px; }
+  .welcome-strip .date-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(255,255,255,0.15); border-radius: 20px;
+    padding: 4px 10px; font-size: 11px; font-weight: 600;
+    margin-top: 10px;
+  }
+
+  .stats-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; padding: 16px 16px 0;
+  }
+  .stat-card {
+    background: var(--white); border-radius: var(--radius);
+    padding: 16px; box-shadow: var(--card-shadow);
+  }
+  .stat-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; margin-bottom: 10px;
+  }
+  .stat-icon.blue { background: var(--primary-light); color: var(--primary); }
+  .stat-icon.orange { background: var(--accent-light); color: var(--accent); }
+  .stat-icon.green { background: var(--success-light); color: var(--success); }
+  .stat-icon.red { background: var(--danger-light); color: var(--danger); }
+  .stat-value { font-size: 24px; font-weight: 800; color: var(--text); line-height: 1; }
+  .stat-label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
+
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 16px 0;
+  }
+  .section-title { font-size: 15px; font-weight: 800; color: var(--text); }
+  .see-all {
+    font-size: 12px; font-weight: 700; color: var(--primary);
+    text-decoration: none;
+  }
+
+  .rental-mini-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none; color: inherit;
+    transition: background 0.15s;
+  }
+  .rental-mini-card:last-child { border-bottom: none; }
+  .rental-mini-card:active { background: var(--bg); }
+  .rmc-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    background: var(--primary-light); color: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .rmc-info { flex: 1; min-width: 0; }
+  .rmc-name { font-size: 14px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rmc-item { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .rmc-right { text-align: right; flex-shrink: 0; }
+  .rmc-amount { font-size: 13px; font-weight: 800; color: var(--primary); }
+
+  .quick-actions {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; padding: 16px 16px 0;
+  }
+  .qa-btn {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; padding: 18px 12px;
+    background: var(--white); border-radius: var(--radius);
+    box-shadow: var(--card-shadow); text-decoration: none;
+    color: var(--text); transition: all 0.2s;
+  }
+  .qa-btn:active { transform: scale(0.97); }
+  .qa-btn i { font-size: 24px; }
+  .qa-btn span { font-size: 12px; font-weight: 700; text-align: center; }
+  .qa-btn.primary { background: var(--primary); color: white; }
+  .qa-btn.accent { background: var(--accent); color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="welcome-strip">
+  <h2>Good day, {{ user }}! 👷</h2>
+  <p>Here's your business overview</p>
+  <div class="date-chip"><i class="fas fa-calendar-alt"></i> <span id="today-date"></span></div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon blue"><i class="fas fa-boxes-stacked"></i></div>
+    <div class="stat-value">{{ total_items }}</div>
+    <div class="stat-label">Total Items</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange"><i class="fas fa-hand-holding"></i></div>
+    <div class="stat-value">{{ active_rentals }}</div>
+    <div class="stat-label">Active Rentals</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green"><i class="fas fa-receipt"></i></div>
+    <div class="stat-value">{{ total_rentals }}</div>
+    <div class="stat-label">Total Rentals</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon red"><i class="fas fa-coins"></i></div>
+    <div class="stat-value" style="font-size:16px;">Rs.{{ "{:,.0f}".format(total_revenue) }}</div>
+    <div class="stat-label">Revenue Collected</div>
+  </div>
+</div>
+
+<div class="quick-actions">
+  <a href="{{ url_for('rent_item') }}" class="qa-btn primary">
+    <i class="fas fa-plus-circle"></i>
+    <span>New Rental</span>
+  </a>
+  <a href="{{ url_for('items') }}" class="qa-btn accent">
+    <i class="fas fa-boxes-stacked"></i>
+    <span>Manage Items</span>
+  </a>
+</div>
+
+{% if recent_rentals %}
+<div class="section-header">
+  <div class="section-title">Recent Rentals</div>
+  <a href="{{ url_for('received_items') }}" class="see-all">See All →</a>
+</div>
+<div class="card" style="padding: 0; overflow: hidden;">
+  {% for r in recent_rentals %}
+  <a href="{{ url_for('rental_detail', rental_id=r.id) }}" class="rental-mini-card">
+    <div class="rmc-icon"><i class="fas fa-wrench"></i></div>
+    <div class="rmc-info">
+      <div class="rmc-name">{{ r.customer_name }}</div>
+      <div class="rmc-item">{{ r.item_name }} × {{ r.quantity }}</div>
+    </div>
+    <div class="rmc-right">
+      <div class="rmc-amount">Rs.{{ "{:,.0f}".format(r.total_amount) }}</div>
+      <span class="badge {% if r.status == 'Returned' %}badge-success{% else %}badge-warning{% endif %}" style="margin-top:4px; font-size:10px;">
+        {{ r.status }}
+      </span>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div style="height: 8px;"></div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const d = new Date();
+  document.getElementById('today-date').textContent = d.toLocaleDateString('en-LK', {weekday:'short', year:'numeric', month:'short', day:'numeric'});
+</script>
+{% endblock %}

@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% block title %}Rent Item — Sahan Rent a Tool{% endblock %}
+
+{% block extra_head %}
+<style>
+  .rent-hero {
+    background: linear-gradient(135deg, #F97316, #EA580C);
+    padding: 16px 16px 20px;
+    color: white;
+  }
+  .rent-hero h2 { font-size: 18px; font-weight: 800; }
+  .rent-hero p { font-size: 13px; opacity: 0.85; margin-top: 3px; }
+
+  .form-section {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    padding: 18px;
+    margin: 12px 16px 0;
+  }
+
+  .line-item {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    background: #fafafa;
+  }
+
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .remove-btn {
+    margin-top: 10px;
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  .add-btn {
+    width: 100%;
+    padding: 12px;
+    border: 2px dashed var(--primary);
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  .total-box {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin: 12px 16px 0;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  @media (min-width: 640px) {
+    .form-section { margin: 12px 24px 0; }
+    .total-box { margin: 12px 24px 0; }
+    .rent-hero { padding: 16px 24px 20px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="rent-hero">
+  <h2><i class="fas fa-hand-holding"></i> New Rental</h2>
+  <p>One customer can rent multiple items at one time</p>
+</div>
+
+{% if error %}
+<div class="alert alert-error">
+  {{ error }}
+</div>
+{% endif %}
+
+<form method="POST" id="rentForm">
+  <div class="form-section">
+    <div class="form-group">
+      <label class="form-label">Full Name *</label>
+      <input type="text" name="customer_name" class="form-control" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Address *</label>
+      <textarea name="address" class="form-control" rows="2" required style="resize:none;"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">NIC Number *</label>
+      <input type="text" name="nic" class="form-control" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Rent Date *</label>
+      <input type="date" name="rent_date" class="form-control" value="{{ today }}" required>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div id="itemsContainer"></div>
+    <button type="button" class="add-btn" onclick="addItemRow()">
+      + Add Another Item
+    </button>
+  </div>
+
+  <div class="total-box">
+    <div>
+      <div style="font-size:13px; opacity:0.85;">Estimated Total Per Day</div>
+      <div style="font-size:11px; opacity:0.7;">Calculated from selected items</div>
+    </div>
+    <div style="font-size:26px; font-weight:800;" id="totalDisplay">Rs. 0</div>
+  </div>
+
+  <div style="padding: 16px;">
+    <button type="submit" class="btn btn-accent btn-block" style="padding:14px; font-size:15px;">
+      <i class="fas fa-save"></i> Save Rental
+    </button>
+  </div>
+</form>
+
+<template id="itemRowTemplate">
+  <div class="line-item">
+    <div class="row-2">
+      <div class="form-group">
+        <label class="form-label">Select Item *</label>
+        <select name="item_id[]" class="form-control item-select" onchange="updateTotal()" required>
+          <option value="">-- Choose an item --</option>
+          {% for item in items %}
+          <option value="{{ item.id }}" data-price="{{ item.price_per_day }}">
+            {{ item.name }} (Rs.{{ "{:,.0f}".format(item.price_per_day) }}/day, Qty: {{ item.quantity }})
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Quantity *</label>
+        <input type="number" name="quantity[]" class="form-control item-qty" min="1" value="1" oninput="updateTotal()" required>
+      </div>
+    </div>
+
+    <button type="button" class="remove-btn" onclick="removeItemRow(this)">Remove</button>
+  </div>
+</template>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function addItemRow() {
+  const tpl = document.getElementById('itemRowTemplate').content.cloneNode(true);
+  document.getElementById('itemsContainer').appendChild(tpl);
+  updateTotal();
+}
+
+function removeItemRow(btn) {
+  btn.closest('.line-item').remove();
+  updateTotal();
+}
+
+function updateTotal() {
+  let total = 0;
+  const rows = document.querySelectorAll('.line-item');
+
+  rows.forEach(row => {
+    const select = row.querySelector('.item-select');
+    const qtyInput = row.querySelector('.item-qty');
+
+    const selected = select.options[select.selectedIndex];
+    const price = parseFloat(selected?.dataset?.price || 0);
+    const qty = parseInt(qtyInput.value || 0);
+
+    total += price * qty;
+  });
+
+  document.getElementById('totalDisplay').textContent = 'Rs. ' + total.toLocaleString('en-LK');
+}
+
+addItemRow();
+</script>
+{% endblock %}

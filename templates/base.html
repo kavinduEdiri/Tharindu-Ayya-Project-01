@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>{% block title %}Sahan Rent a Tool{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #1A6BCC;
+    --primary-dark: #1457A8;
+    --primary-light: #E8F1FB;
+    --accent: #F97316;
+    --accent-light: #FFF3E8;
+    --success: #16A34A;
+    --success-light: #DCFCE7;
+    --danger: #DC2626;
+    --danger-light: #FEE2E2;
+    --text: #1E293B;
+    --text-muted: #64748B;
+    --border: #E2E8F0;
+    --bg: #F1F5F9;
+    --white: #FFFFFF;
+    --card-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    --nav-h: 68px;
+    --top-h: 60px;
+    --radius: 14px;
+    --radius-sm: 10px;
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: var(--top-h);
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px;
+    z-index: 100;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+  }
+  .topbar-brand {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .topbar-logo {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 16px;
+  }
+  .topbar-title {
+    font-size: 15px; font-weight: 800; color: var(--primary);
+    line-height: 1.1;
+  }
+  .topbar-sub { font-size: 10px; color: var(--text-muted); font-weight: 500; }
+  .topbar-user {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 600; color: var(--text-muted);
+  }
+  .topbar-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--primary-light);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--primary); font-size: 13px; font-weight: 700;
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main-content {
+    margin-top: var(--top-h);
+    padding-bottom: calc(var(--nav-h) + 16px);
+    min-height: calc(100vh - var(--top-h));
+  }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: var(--nav-h);
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center;
+    z-index: 100;
+    box-shadow: 0 -2px 16px rgba(0,0,0,0.07);
+    padding: 0 4px;
+  }
+  .nav-item {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 10px; font-weight: 600;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .nav-item i { font-size: 20px; transition: all 0.2s; }
+  .nav-item.active { color: var(--primary); }
+  .nav-item.active i { color: var(--primary); }
+  .nav-item.active::before {
+    content: '';
+    position: absolute; top: 0; left: 20%; right: 20%; height: 3px;
+    background: var(--primary); border-radius: 0 0 4px 4px;
+  }
+  .nav-item.logout-item { color: var(--danger); }
+  .nav-item.logout-item i { color: var(--danger); }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    padding: 20px 16px 0;
+  }
+  .page-title { font-size: 20px; font-weight: 800; color: var(--text); }
+  .page-sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    padding: 16px;
+    margin: 12px 16px 0;
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 20px;
+    border-radius: var(--radius-sm); border: none; cursor: pointer;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px; font-weight: 700;
+    text-decoration: none; transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+  .btn-accent { background: var(--accent); color: white; }
+  .btn-accent:hover { opacity: 0.9; }
+  .btn-success { background: var(--success); color: white; }
+  .btn-danger { background: var(--danger); color: white; }
+  .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text-muted); }
+  .btn-sm { padding: 8px 14px; font-size: 12px; border-radius: 8px; }
+  .btn-block { width: 100%; }
+
+  /* ── FORMS ── */
+  .form-group { margin-bottom: 16px; }
+  .form-label {
+    display: block; font-size: 12px; font-weight: 700;
+    color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .form-control {
+    width: 100%; padding: 12px 14px;
+    border: 2px solid var(--border); border-radius: var(--radius-sm);
+    font-family: 'Plus Jakarta Sons', sans-serif; font-size: 14px; color: var(--text);
+    background: var(--white); outline: none; transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .form-control:focus { border-color: var(--primary); }
+  .form-control::placeholder { color: #B0BAC9; }
+  select.form-control { cursor: pointer; }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+  }
+  .badge-success { background: var(--success-light); color: var(--success); }
+  .badge-warning { background: #FEF3C7; color: #B45309; }
+  .badge-danger { background: var(--danger-light); color: var(--danger); }
+
+  /* ── ALERTS ── */
+  .alert {
+    padding: 12px 16px; border-radius: var(--radius-sm);
+    margin: 12px 16px 0; font-size: 13px; font-weight: 600;
+  }
+  .alert-error { background: var(--danger-light); color: var(--danger); border-left: 4px solid var(--danger); }
+
+  /* ── DIVIDER ── */
+  .divider { height: 1px; background: var(--border); margin: 12px 0; }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center; padding: 48px 24px;
+    color: var(--text-muted);
+  }
+  .empty-state i { font-size: 48px; opacity: 0.3; margin-bottom: 12px; display: block; }
+  .empty-state p { font-size: 14px; font-weight: 600; }
+
+  /* ── RESPONSIVE ── */
+  @media (min-width: 640px) {
+    .topbar { padding: 0 32px; }
+    .page-header { padding: 24px 24px 0; }
+    .card { margin: 16px 24px 0; }
+    .alert { margin: 16px 24px 0; }
+  }
+  @media (min-width: 768px) {
+    .main-content { max-width: 480px; margin: var(--top-h) auto 0; }
+    .bottom-nav { max-width: 480px; left: 50%; transform: translateX(-50%); border-radius: var(--radius) var(--radius) 0 0; }
+    .topbar { max-width: none; }
+  }
+</style>
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+
+{% if session.user %}
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo"><i class="fas fa-tools"></i></div>
+    <div>
+      <div class="topbar-title">Sahan Rent a Tool</div>
+      <div class="topbar-sub">Construction Equipment Rentals</div>
+    </div>
+  </div>
+  <div class="topbar-user">
+    <div class="topbar-avatar">{{ session.user[0] }}</div>
+    <span class="d-none-xs">{{ session.user }}</span>
+  </div>
+</div>
+{% endif %}
+
+<div class="main-content">
+  {% block content %}{% endblock %}
+</div>
+
+{% if session.user %}
+<nav class="bottom-nav">
+  <a href="{{ url_for('rent_item') }}" class="nav-item {% if request.endpoint == 'rent_item' %}active{% endif %}">
+    <i class="fas fa-hand-holding"></i>
+    <span>Rent Item</span>
+  </a>
+  <a href="{{ url_for('received_items') }}" class="nav-item {% if request.endpoint in ['received_items','rental_detail'] %}active{% endif %}">
+    <i class="fas fa-clipboard-list"></i>
+    <span>Rentals</span>
+  </a>
+  <a href="{{ url_for('items') }}" class="nav-item {% if request.endpoint in ['items','add_item','edit_item'] %}active{% endif %}">
+    <i class="fas fa-boxes-stacked"></i>
+    <span>Items</span>
+  </a>
+  <a href="{{ url_for('dashboard') }}" class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+    <i class="fas fa-chart-pie"></i>
+    <span>Dashboard</span>
+  </a>
+  <a href="{{ url_for('logout') }}" class="nav-item logout-item">
+    <i class="fas fa-right-from-bracket"></i>
+    <span>Logout</span>
+  </a>
+</nav>
+{% endif %}
+
+{% block scripts %}{% endblock %}
+</body>
+</html>
