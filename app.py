@@ -2,8 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 from pymongo import MongoClient
 from datetime import datetime, date
 from functools import wraps
-from dotenv import load_dotenv
-load_dotenv()
+# from dotenv import load_dotenv
+# load_dotenv()
 import os
 import uuid
 
