@@ -34,6 +34,15 @@
     margin-top: 4px;
   }
 
+  .detail-hero .phone {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-top: 8px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
   .detail-hero .address {
     font-size: 13px;
     opacity: 0.85;
@@ -260,6 +269,11 @@
 <div class="detail-hero">
   <div class="customer">{{ rental.customer_name }}</div>
   <div class="nic"><i class="fas fa-id-card"></i> {{ rental.nic }}</div>
+
+  {% if rental.customer_phone %}
+  <div class="phone"><i class="fas fa-phone"></i> {{ rental.customer_phone }}</div>
+  {% endif %}
+
   <div class="address"><i class="fas fa-location-dot"></i> {{ rental.address }}</div>
   <div class="status-row">
     <span class="status-pill {% if rental.status == 'Rented' %}rented{% else %}returned{% endif %}">

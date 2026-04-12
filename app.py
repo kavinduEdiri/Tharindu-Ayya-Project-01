@@ -2,10 +2,12 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 from pymongo import MongoClient
 from datetime import datetime, date
 from functools import wraps
-# from dotenv import load_dotenv
-# load_dotenv()
+#from dotenv import load_dotenv
+#load_dotenv()
 import os
 import uuid
+
+
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-key")
@@ -62,9 +64,6 @@ def calculate_days(rent_date_str, return_date_str):
 
 
 def enrich_rental_for_view(rental):
-    """
-    Add summary fields so templates can show total items easily.
-    """
     rental_items = rental.get("items", [])
     rental["item_name"] = ", ".join([i["item_name"] for i in rental_items]) if rental_items else ""
     rental["quantity"] = sum(i.get("quantity", 0) for i in rental_items)
@@ -219,6 +218,7 @@ def get_item(item_id):
 def rent_item():
     if request.method == 'POST':
         customer_name = request.form['customer_name'].strip()
+        customer_phone = request.form['customer_phone'].strip()
         address = request.form['address'].strip()
         nic = request.form['nic'].strip()
         rent_date = request.form['rent_date']
@@ -299,6 +299,7 @@ def rent_item():
         rental = {
             "id": "r" + str(uuid.uuid4())[:8],
             "customer_name": customer_name,
+            "customer_phone": customer_phone,
             "address": address,
             "nic": nic,
             "rent_date": rent_date,
