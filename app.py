@@ -389,6 +389,27 @@ def generate_invoice(rental_id):
 
 
 # =========================
+# DELETE RENTAL
+# =========================
+@app.route('/rental/<rental_id>/delete', methods=['POST'])
+@login_required
+def delete_rental(rental_id):
+    rental = rentals_collection.find_one({"id": rental_id}, {"_id": 0})
+
+    if rental:
+        # If still rented, restore item quantities back to inventory
+        if rental.get('status') == 'Rented':
+            for rental_item in rental.get("items", []):
+                items_collection.update_one(
+                    {"id": rental_item['item_id']},
+                    {"$inc": {"quantity": rental_item['quantity']}}
+                )
+        rentals_collection.delete_one({"id": rental_id})
+
+    return redirect(url_for('received_items'))
+
+
+# =========================
 # HEALTH CHECK
 # =========================
 @app.route('/health')

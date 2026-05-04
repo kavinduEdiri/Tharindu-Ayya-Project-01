@@ -16,17 +16,17 @@
   .ftab.active { background: var(--primary); color: white; border-color: var(--primary); }
 
   .rental-card {
-    display: block; background: var(--white); border-radius: var(--radius);
+    background: var(--white); border-radius: var(--radius);
     box-shadow: var(--card-shadow); padding: 16px;
-    margin: 10px 16px 0; text-decoration: none; color: inherit;
-    transition: all 0.2s; position: relative; overflow: hidden;
+    margin: 10px 16px 0; color: inherit;
+    position: relative; overflow: hidden;
   }
-  .rental-card:active { transform: scale(0.98); }
   .rental-card::before {
     content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
     background: var(--primary);
   }
   .rental-card.returned::before { background: var(--success); }
+
   .rc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
   .rc-customer { font-size: 15px; font-weight: 800; color: var(--text); }
   .rc-nic { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
@@ -34,13 +34,35 @@
     display: flex; gap: 14px; padding-top: 10px;
     border-top: 1px solid var(--border);
   }
-  .rc-meta-item {
-    display: flex; flex-direction: column; gap: 2px;
-  }
+  .rc-meta-item { display: flex; flex-direction: column; gap: 2px; }
   .rc-meta-label { font-size: 10px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
   .rc-meta-value { font-size: 13px; font-weight: 700; color: var(--text); }
   .rc-meta-value.price { color: var(--accent); }
   .rc-arrow { color: var(--text-muted); font-size: 14px; }
+
+  .rc-link {
+    display: block; text-decoration: none; color: inherit;
+    transition: all 0.2s;
+  }
+  .rc-link:active { transform: scale(0.98); }
+
+  .rc-actions {
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    color: #ef4444;
+    font-size: 15px;
+    line-height: 1;
+    transition: background 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .delete-btn:hover { background: #fee2e2; }
 
   .summary-strip {
     background: var(--white); border-radius: var(--radius);
@@ -51,6 +73,33 @@
   .ss-item + .ss-item { border-left: 1px solid var(--border); }
   .ss-value { font-size: 20px; font-weight: 800; color: var(--text); }
   .ss-label { font-size: 10px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+
+  /* Confirm modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45); z-index: 1000;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: var(--white); border-radius: 16px;
+    padding: 28px 24px 20px; max-width: 320px; width: 90%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18); text-align: center;
+  }
+  .modal-icon { font-size: 36px; margin-bottom: 10px; }
+  .modal-title { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+  .modal-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 10px; }
+  .modal-cancel {
+    flex: 1; padding: 11px; border-radius: 10px; border: 2px solid var(--border);
+    background: var(--white); color: var(--text-muted); font-weight: 700;
+    font-size: 14px; cursor: pointer;
+  }
+  .modal-confirm {
+    flex: 1; padding: 11px; border-radius: 10px; border: none;
+    background: #ef4444; color: white; font-weight: 700;
+    font-size: 14px; cursor: pointer;
+  }
 
   @media (min-width: 640px) {
     .filter-tabs { padding: 12px 24px 0; }
@@ -93,41 +142,52 @@
 
 {% if rentals %}
   {% for r in rentals %}
-  <a href="{{ url_for('rental_detail', rental_id=r.id) }}"
-     class="rental-card {% if r.status == 'Returned' %}returned{% endif %}"
-     data-status="{{ r.status }}">
+  <div class="rental-card {% if r.status == 'Returned' %}returned{% endif %}"
+       data-status="{{ r.status }}">
+
     <div class="rc-top">
-      <div>
+      <a href="{{ url_for('rental_detail', rental_id=r.id) }}" class="rc-link" style="flex:1;">
         <div class="rc-customer">{{ r.customer_name }}</div>
         <div class="rc-nic">NIC: {{ r.nic }}</div>
-      </div>
-      <div style="display:flex; align-items:center; gap:8px;">
+      </a>
+      <div class="rc-actions">
         <span class="badge {% if r.status == 'Returned' %}badge-success{% else %}badge-warning{% endif %}">
           <i class="fas fa-{% if r.status == 'Returned' %}check-circle{% else %}clock{% endif %}"></i>
           {{ r.status }}
         </span>
-        <i class="fas fa-chevron-right rc-arrow"></i>
+        <button class="delete-btn"
+                onclick="confirmDelete('{{ r.id }}', '{{ r.customer_name }}')"
+                title="Delete record">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+        <a href="{{ url_for('rental_detail', rental_id=r.id) }}">
+          <i class="fas fa-chevron-right rc-arrow"></i>
+        </a>
       </div>
     </div>
-    <div class="rc-meta">
-      <div class="rc-meta-item">
-        <span class="rc-meta-label">Item</span>
-        <span class="rc-meta-value">{{ r.item_name }}</span>
+
+    <a href="{{ url_for('rental_detail', rental_id=r.id) }}" class="rc-link">
+      <div class="rc-meta">
+        <div class="rc-meta-item">
+          <span class="rc-meta-label">Item</span>
+          <span class="rc-meta-value">{{ r.item_name }}</span>
+        </div>
+        <div class="rc-meta-item">
+          <span class="rc-meta-label">Date</span>
+          <span class="rc-meta-value">{{ r.rent_date }}</span>
+        </div>
+        <div class="rc-meta-item">
+          <span class="rc-meta-label">Days</span>
+          <span class="rc-meta-value">{{ r.num_days }}d</span>
+        </div>
+        <div class="rc-meta-item">
+          <span class="rc-meta-label">Total</span>
+          <span class="rc-meta-value price">Rs.{{ "{:,.0f}".format(r.total_amount) }}</span>
+        </div>
       </div>
-      <div class="rc-meta-item">
-        <span class="rc-meta-label">Date</span>
-        <span class="rc-meta-value">{{ r.rent_date }}</span>
-      </div>
-      <div class="rc-meta-item">
-        <span class="rc-meta-label">Days</span>
-        <span class="rc-meta-value">{{ r.num_days }}d</span>
-      </div>
-      <div class="rc-meta-item">
-        <span class="rc-meta-label">Total</span>
-        <span class="rc-meta-value price">Rs.{{ "{:,.0f}".format(r.total_amount) }}</span>
-      </div>
-    </div>
-  </a>
+    </a>
+
+  </div>
   {% endfor %}
 {% else %}
   <div class="empty-state">
@@ -137,6 +197,22 @@
 {% endif %}
 
 <div style="height: 8px;"></div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal-box">
+    <div class="modal-icon">🗑️</div>
+    <div class="modal-title">Delete Rental?</div>
+    <div class="modal-sub" id="modalSub">This will permanently delete the rental record.</div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <form id="deleteForm" method="POST" style="flex:1;">
+        <button type="submit" class="modal-confirm" style="width:100%;">Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -148,5 +224,21 @@ function filterRentals(status, el) {
     card.style.display = (status === 'all' || card.dataset.status === status) ? 'block' : 'none';
   });
 }
+
+function confirmDelete(rentalId, customerName) {
+  document.getElementById('modalSub').textContent =
+    `This will permanently delete the rental record for "${customerName}".`;
+  document.getElementById('deleteForm').action = `/rental/${rentalId}/delete`;
+  document.getElementById('deleteModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('deleteModal').classList.remove('show');
+}
+
+// Close modal if clicking outside the box
+document.getElementById('deleteModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
 </script>
 {% endblock %}
